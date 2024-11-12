@@ -1,3 +1,5 @@
+#!/bin/env python
+
 import exifread as ef
 
 
