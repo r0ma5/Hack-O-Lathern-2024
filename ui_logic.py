@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for
 import os
+import requests
+import json
 
 app = Flask(__name__)
 
 # Set the upload folder and allowed extensions
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+
+API_ENDPOINT='http://3.239.185.205:8000/image'
 
 
 # Function to check allowed extensions
@@ -32,7 +36,12 @@ def upload_file():
             filename = file.filename
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
-            rating = .5 # Example rating value
+            with open(filepath, 'rb') as f:
+                data = f.read()
+                files = {'file': data}
+                api_response = requests.post(API_ENDPOINT, files=files, auth=('Hack-A-Ton', 'Hack-O-Lathern-2024'))
+                data = json.loads(api_response.text)
+            rating = data.get('data').get('score')
             rating_percentage = (rating) * 100
             return render_template('rating_bar.html', rating=rating, rating_percentage=rating_percentage)
         else:
