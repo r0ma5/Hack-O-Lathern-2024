@@ -1,7 +1,10 @@
+import secrets
 from typing import Annotated
 from fastapi import FastAPI, UploadFile, Request, Response, status
+from fastapi import Depends, HTTPException
 import requests, json, logging, uvicorn, os
 import rule_engine
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 ai_generated_image = rule_engine.Rule(
     'ais >= 0.5 and qs < 0.85'
@@ -12,7 +15,32 @@ modified_image = rule_engine.Rule(
 )
 
 logger = logging.getLogger('uvicorn.error')
-app = FastAPI()
+
+
+security = HTTPBasic()
+
+app = FastAPI(dependencies=[Depends(security)])
+
+def get_current_username(
+    credentials: Annotated[HTTPBasicCredentials, Depends(security)],
+):
+    current_username_bytes = credentials.username.encode("utf8")
+    correct_username_bytes = b"Hack-A-Ton"
+    is_correct_username = secrets.compare_digest(
+        current_username_bytes, correct_username_bytes
+    )
+    current_password_bytes = credentials.password.encode("utf8")
+    correct_password_bytes = b"Hack-O-Lathern-2024"
+    is_correct_password = secrets.compare_digest(
+        current_password_bytes, correct_password_bytes
+    )
+    if not (is_correct_username and is_correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
 
 API_ENDPOINT = 'https://api.sightengine.com/1.0/check.json'
 
@@ -23,7 +51,7 @@ API_PARAMS = {
 }
 
 @app.post('/image')
-async def inspect_image(request: Request, file: UploadFile, response: Response):
+async def inspect_image(request: Request, file: UploadFile, response: Response, dependencies=[Depends(get_current_username)]):
     logger.info(f'{request.client.host}:{request.client.port} - "POST /image"')
     logger.info('Getting image upload...')
     try:
@@ -79,4 +107,4 @@ async def inspect_image(request: Request, file: UploadFile, response: Response):
 
     return {'message': 'Image processed successfully', 'error': False, 'data': rs}
 
-uvicorn.run(app)
+uvicorn.run(app, host='0.0.0.0')
