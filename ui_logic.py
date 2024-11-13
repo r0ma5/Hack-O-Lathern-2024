@@ -42,7 +42,7 @@ def upload_file():
                 data = f.read()
                 files = {'file': data}
                 try:
-                    api_response = requests.post(API_ENDPOINT, files=files)
+                    api_response = requests.post(API_ENDPOINT, files=files, auth=(os.environ['IMAGE_API_USER'], os.environ['IMAGE_API_SECRET']))
                     data = json.loads(api_response.text)
                     rating = data.get('data').get('score')
                     rating_percentage = (rating) * 100
