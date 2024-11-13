@@ -37,17 +37,18 @@ def upload_file():
             filename = file.filename
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
+            api_response = ""
             with open(filepath, 'rb') as f:
                 data = f.read()
                 files = {'file': data}
                 try:
-                    api_response = requests.post(API_ENDPOINT, files=files, auth=(os.environ['IMAGE_API_USER'], os.environ['IMAGE_API_SECRET']))
+                    api_response = requests.post(API_ENDPOINT, files=files)
                     data = json.loads(api_response.text)
                     rating = data.get('data').get('score')
                     rating_percentage = (rating) * 100
                     return render_template('rating_bar.html', rating=rating, rating_percentage=rating_percentage, image=f'uploads/{file.filename}')
                 except Exception as e:
-                    return {'Message': 'Error occurred processing Image. Try again', 'Exception': e.args}
+                    return {'Message': 'Error occurred processing Image. Try again', 'Exception': e.args, 'ApiRespStatus': api_response.status_code, 'ApiRespText': api_response.text}
         else:
             return 'Invalid file format. Only image files are allowed.', 400
 
