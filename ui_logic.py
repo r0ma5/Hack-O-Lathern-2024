@@ -47,7 +47,7 @@ def upload_file():
                     rating_percentage = (rating) * 100
                     return render_template('rating_bar.html', rating=rating, rating_percentage=rating_percentage, image=f'uploads/{file.filename}')
                 except Exception as e:
-                    return 'Error occurred processing Image. Try again'
+                    return {'Message': 'Error occurred processing Image. Try again', 'Exception': e.args}
         else:
             return 'Invalid file format. Only image files are allowed.', 400
 
