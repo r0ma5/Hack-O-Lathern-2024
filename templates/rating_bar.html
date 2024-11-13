@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rating Bar</title>
+    <style>
+        .title {
+            margin-left: 20px;
+        }
+        .rating-bar {
+            width: 50%;
+            height: 25px;
+            background-color: red;
+            border-radius: 10px;
+            margin-left: 20px;
+            background-image: linear-gradient(to right, green, yellow, red);
+        }
+        body {
+            background: transparent;
+        }
+        .marker {
+            transform: rotate(180deg);
+            width: 40px;
+            padding-bottom: 0;
+            margin-top: -20px;
+            margin-left: -20px;
+            position: relative;
+            left: {{ rating_percentage }}%;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">Image Score: {{ rating }}</h1>
+    <div class="rating-bar">
+    <img src="../static/transparent_marker.png" class="marker"></img>
+    </div>
+</body>
+</html>
