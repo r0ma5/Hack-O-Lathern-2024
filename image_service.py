@@ -9,7 +9,7 @@ from io import BytesIO, StringIO
 app = FastAPI()
 
 params = {
-  'models': 'text,genai',
+  'models': 'quality,genai',
   'api_user': os.getenv("SIGHTENGINE_USER"),
   'api_secret': os.getenv("SIGHTENGINE_SECRET"),
 }
@@ -31,8 +31,8 @@ async def create_upload_file(file: UploadFile):
     files = { 'media': data }
     r = requests.post('https://api.sightengine.com/1.0/check.json', files=files, data=params)
     return {
-        'ai_screening': json.loads(r.text),
-        'exif_tags': image_tags
+        'ai_screening': json.loads(r.text)
+  #       'exif_tags': image_tags
     }
 
 

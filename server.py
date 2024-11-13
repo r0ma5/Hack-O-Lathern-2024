@@ -1,6 +1,15 @@
 from typing import Annotated
 from fastapi import FastAPI, UploadFile, Request, Response, status
 import requests, json, logging, uvicorn, os
+import rule_engine
+
+ai_generated_image = rule_engine.Rule(
+    'ais >= 0.5 and qs < 0.85'
+)
+
+modified_image = rule_engine.Rule(
+    'ais < 0.1 and qs < 0.85'
+)
 
 logger = logging.getLogger('uvicorn.error')
 app = FastAPI()
@@ -8,7 +17,7 @@ app = FastAPI()
 API_ENDPOINT = 'https://api.sightengine.com/1.0/check.json'
 
 API_PARAMS = {
-    'models': 'text,genai',
+    'models': 'genai,quality',
     'api_user': os.environ['SIGHTENGINE_USER'],
     'api_secret': os.environ['SIGHTENGINE_SECRET']
 }
@@ -46,6 +55,28 @@ async def inspect_image(request: Request, file: UploadFile, response: Response):
     
     logger.info('Operation was successful')
 
-    return {'message': 'Image processed successfully', 'error': False, 'data': json.loads(api_response.text)}
+    try:
+        data = json.loads(api_response.text)
+        logger.info(data)
+        scoring_data = {
+            "id": data.get('media').get('id'),
+            "ais": data.get('type').get('ai_generated'),
+            "qs": data.get('quality').get('score')
+        }
+        if ai_generated_image.matches(scoring_data):
+            logger.info('{id} - AI generated image: score 1.0'.format(id=scoring_data.get('id')))
+            rs = {"score": 1.0}
+        elif modified_image.matches(scoring_data):
+            logger.info('{id} - Modified image: score 0.5'.format(id=scoring_data.get('id')))
+            rs = {"score": 0.5}
+        else:
+            logger.info('{id} - Good image: score 0.0'.format(id=scoring_data.get('id')))
+            rs = {"score": 0.0}
+    except Exception as e:
+        logger.info(f'Error - {e.args}')
+        return {'message': 'Error occurred when parsing Sightengine API output', 'error': True}
+
+
+    return {'message': 'Image processed successfully', 'error': False, 'data': rs}
 
 uvicorn.run(app)
