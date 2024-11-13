@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
-import os
+import os, io
+from base64 import b64encode
 import requests
 import json
 
@@ -39,11 +40,14 @@ def upload_file():
             with open(filepath, 'rb') as f:
                 data = f.read()
                 files = {'file': data}
-                api_response = requests.post(API_ENDPOINT, files=files, auth=('Hack-A-Ton', 'Hack-O-Lathern-2024'))
-                data = json.loads(api_response.text)
-            rating = data.get('data').get('score')
-            rating_percentage = (rating) * 100
-            return render_template('rating_bar.html', rating=rating, rating_percentage=rating_percentage, image=f'uploads/{file.filename}')
+                try:
+                    api_response = requests.post(API_ENDPOINT, files=files, auth=(os.environ['IMAGE_API_USER'], os.environ['IMAGE_API_SECRET']))
+                    data = json.loads(api_response.text)
+                    rating = data.get('data').get('score')
+                    rating_percentage = (rating) * 100
+                    return render_template('rating_bar.html', rating=rating, rating_percentage=rating_percentage, image=f'uploads/{file.filename}')
+                except Exception as e:
+                    return 'Error occurred processing Image. Try again'
         else:
             return 'Invalid file format. Only image files are allowed.', 400
 
