@@ -28,13 +28,10 @@ def get_gps(filepath):
         decode = GPSTAGS.get(key,key)
         gps_info[decode] = exif_table['GPSInfo'][key]
 
-    print(gps_info)
-
     latitude = gps_info['GPSLatitude']
     latitude_ref = gps_info['GPSLatitudeRef']
     longitude = gps_info['GPSLongitude']
     longitude_ref = gps_info['GPSLongitudeRef']
-    print(latitude, latitude_ref, longitude, longitude_ref)
 
     if latitude:
         lat_value = _convert_to_degress(latitude)
