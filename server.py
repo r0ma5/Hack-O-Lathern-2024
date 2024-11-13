@@ -107,4 +107,4 @@ async def inspect_image(request: Request, file: UploadFile, response: Response, 
 
     return {'message': 'Image processed successfully', 'error': False, 'data': rs}
 
-uvicorn.run(app)
+uvicorn.run(app, host='0.0.0.0')
