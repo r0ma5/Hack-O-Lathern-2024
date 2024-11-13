@@ -1,37 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rating Bar</title>
     <style>
-        .title {
-            margin-left: 20px;
-        }
-        .rating-bar {
-            width: 50%;
-            height: 25px;
-            background-color: red;
-            border-radius: 10px;
-            margin-left: 20px;
-            background-image: linear-gradient(to right, green, yellow, red);
-        }
+        /* General Body Styling */
         body {
-            background: transparent;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            text-align: center;
         }
-        .marker {
-            transform: rotate(180deg);
-            width: 40px;
-            padding-bottom: 0;
-            margin-top: -20px;
-            margin-left: -20px;
+
+        /* Title Styling */
+        .title {
+            margin-top: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Image Styling */
+        img {
+            max-width: 80%; /* Adjust image width to 80% of screen width */
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        /* Rating Bar Container */
+        .rating-bar-container {
             position: relative;
+            width: 80%; /* Set the width of the bar container */
+            height: 30px;
+            margin: 30px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Full-width gradient applied to the rating bar background */
+        .rating-bar-background {
+            height: 100%;
+            background-image: linear-gradient(to right, green, yellow, red);
+            border-radius: 15px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; /* Gradient spans the full width of the container */
+        }
+
+        /* Rating Bar (filled based on percentage) */
+        .rating-bar {
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0); /* Transparent background */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: {{ rating_percentage }}%; /* Dynamic width from the server */
+            z-index: 1;
+            border-radius: 15px;
+        }
+
+        /* Marker */
+        .marker {
+            position: absolute;
+            top: -10px;
             left: {{ rating_percentage }}%;
+            transform: translateX(-50%); /* Center the marker */
+            width: 30px;
+            height: 30px;
+            background-image: url("../static/transparent_marker.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 2;
+        }
+
+        /* Legend Container */
+        .rating-legend {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
+
+        /* Legend Item */
+        .legend-item {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            width: 100px; /* Increased width for better alignment */
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #ffffff; /* White background for contrast */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for emphasis */
+        }
+
+        /* Color adjustments for better visibility */
+        .legend-item div:first-child {
+            font-size: 1.2rem;
+            color: #000; /* Black for all the rating values for better contrast */
+            font-weight: bold;
+        }
+
+        .legend-item div:last-child {
+            font-size: 1rem;
+            color: #555; /* Slightly darker color for the description */
+        }
+
+        /* Optional link to upload another image */
+        .upload-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .upload-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h1 class="title">Image Score: {{ rating }}</h1>
-    <div class="rating-bar">
-    <img src="../static/transparent_marker.png" class="marker"></img>
+<!-- Title of the page -->
+<h1 class="title">Image Score: {{ rating }}</h1>
+
+<!-- Display uploaded image -->
+<img src="{{ url_for('static', filename=image) }}" alt="Uploaded Image">
+
+<!-- Rating Bar -->
+<div class="rating-bar-container">
+    <!-- Full-width gradient background -->
+    <div class="rating-bar-background"></div>
+    <!-- Rating Bar fill (percentage-based) -->
+    <div class="rating-bar"></div>
+    <!-- Marker for the rating -->
+    <div class="marker"></div>
+</div>
+
+<!-- Rating Legend -->
+<div class="rating-legend">
+    <div class="legend-item">
+        <div style="color: green;">0.0</div>
+        <div>Good</div>
     </div>
+    <div class="legend-item">
+        <div class="rating-value" style="background-color: yellow; color: black;">0.5</div>
+        <div>Digitally Remastered</div>
+    </div>
+    <div class="legend-item">
+        <div style="color: red;">1.0</div>
+        <div>AI Generated</div>
+    </div>
+</div>
+
 </body>
 </html>

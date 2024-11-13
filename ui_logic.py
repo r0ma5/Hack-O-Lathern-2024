@@ -6,7 +6,7 @@ import json
 app = Flask(__name__)
 
 # Set the upload folder and allowed extensions
-app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 API_ENDPOINT='http://3.239.185.205:8000/image'
@@ -43,7 +43,7 @@ def upload_file():
                 data = json.loads(api_response.text)
             rating = data.get('data').get('score')
             rating_percentage = (rating) * 100
-            return render_template('rating_bar.html', rating=rating, rating_percentage=rating_percentage)
+            return render_template('rating_bar.html', rating=rating, rating_percentage=rating_percentage, image=f'uploads/{file.filename}')
         else:
             return 'Invalid file format. Only image files are allowed.', 400
 
