@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # Set the upload folder and allowed extensions
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif', 'jfif'}
 
 API_ENDPOINT='http://3.239.185.205:8000/image'
 
